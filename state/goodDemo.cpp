@@ -1,10 +1,6 @@
 /*
-Better code
-Insight: When you have a handful of flags where only one is true at a time, that’s a hint that what you have are states 
-that can be represented through enums (the GoodDemo represents states using classes)
-Instead of switching on the inputs in handleInput, we actually switch on the states, which is more intuitive. 
-Samething in update(), we also switch on the states. This allows us to see how exactly the 
-states are changing what to render. Conversely, in badDemo, this is often implicit
+Good code. Still not best. 
+See http://gameprogrammingpatterns.com/state.html for hierarchial state machines
 */
 
 #include <SFML/Graphics.hpp>
@@ -18,28 +14,16 @@ enum State
     STATE_DIVING
 };
 
-class Game
+class Player
 {
 public:
-    Game() : mWindow(sf::VideoMode(500, 500), "SFML works!"), mPlayer()
+    Player()
     {
         mPlayer.setRadius(40.f);
         mPlayer.setPosition(100.f, 100.f);
         mPlayer.setFillColor(sf::Color::Cyan);
     }
-    void run()
-    {
-        sf::Clock clock;
-        while (mWindow.isOpen())
-        {
-            sf::Time deltaTime = clock.restart();
-            processEvents();
-            update(deltaTime); // To improve this, use fixed timesteps: https://subscription.packtpub.com/book/game_development/9781849696845/1/ch01lvl1sec11/game-loops-and-frames
-            render();
-        }
-    }
 
-private:
     void update(sf::Time deltaTime)
     {
         sf::Vector2f movement(0.f, 0.f);
@@ -92,35 +76,8 @@ private:
 
         mPlayer.move(velocity * deltaTime.asSeconds()); // velocity * time = distance
     }
-    void render()
-    {
-        mWindow.clear();
-        mWindow.draw(mPlayer);
-        mWindow.display();
-    }
 
-    void processEvents()
-    {
-        sf::Event event;
-        while (mWindow.pollEvent(event))
-        {
-            switch (event.type)
-            {
-            case sf::Event::KeyPressed:
-                handlePlayerInput(event.key.code, true);
-                break;
-            case sf::Event::KeyReleased:
-                handlePlayerInput(event.key.code, false);
-                break;
-            case sf::Event::Closed:
-                mWindow.close();
-                break;
-            }
-        }
-    }
-
-    // we switch on the state instead of the input!
-    void handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
+    void handleInput(sf::Keyboard::Key key, bool isPressed)
     {
         switch (state_)
         {
@@ -179,8 +136,12 @@ private:
         }
     }
 
+    sf::CircleShape getDrawable()
+    {
+        return mPlayer;
+    }
+
 private:
-    sf::RenderWindow mWindow;
     sf::CircleShape mPlayer;
     sf::Vector2f velocity;
     bool mIsMovingLeft = false, mIsMovingRight = false;
@@ -188,6 +149,59 @@ private:
     float gravity = 10;
     float groundBound = 400;      // objects should not exceed this, recall that
     State state_ = STATE_JUMPING; // start off jumping because object starts in air
+};
+
+class Game
+{
+public:
+    Game() : mWindow(sf::VideoMode(500, 500), "SFML works!") {}
+    void run()
+    {
+        sf::Clock clock;
+        while (mWindow.isOpen())
+        {
+            sf::Time deltaTime = clock.restart();
+            processEvents();
+            update(deltaTime); // To improve this, use fixed timesteps: https://subscription.packtpub.com/book/game_development/9781849696845/1/ch01lvl1sec11/game-loops-and-frames
+            render();
+        }
+    }
+
+private:
+    void update(sf::Time deltaTime)
+    {
+        player.update(deltaTime);
+    }
+    void render()
+    {
+        mWindow.clear();
+        mWindow.draw(player.getDrawable());
+        mWindow.display();
+    }
+
+    void processEvents()
+    {
+        sf::Event event;
+        while (mWindow.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            case sf::Event::KeyPressed:
+                player.handleInput(event.key.code, true);
+                break;
+            case sf::Event::KeyReleased:
+                player.handleInput(event.key.code, false);
+                break;
+            case sf::Event::Closed:
+                mWindow.close();
+                break;
+            }
+        }
+    }
+
+private:
+    Player player;
+    sf::RenderWindow mWindow;
 };
 
 int main()
