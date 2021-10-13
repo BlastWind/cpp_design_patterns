@@ -1,4 +1,4 @@
- g++ badDemo1.cpp -o badDemo1.out -lsfml-graphics -lsfml-window -lsfml-system &
+ g++ badDemo0.cpp -o badDemo.out -lsfml-graphics -lsfml-window -lsfml-system &
  process_id=$!
  wait $!
- ./badDemo1.out
+ ./badDemo0.out
