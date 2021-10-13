@@ -8,3 +8,8 @@ To run, make sure you can installed SFML, and then you can run
  ./badDemo.out
 ```
 
+Player is able to: 
+Jump (J)
+Crouch (C) // Does not affect sprite, just changes color to red
+Dive (Spacebar)
+Move Left, Right (A, D)

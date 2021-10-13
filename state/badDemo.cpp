@@ -101,30 +101,35 @@ private:
 
     void handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
     {
-        if (key == sf::Keyboard::A)
-            mIsMovingLeft = isPressed;
-        else if (key == sf::Keyboard::D)
-            mIsMovingRight = isPressed;
-        else if (key == sf::Keyboard::J)
+
+        switch (key)
         {
+        case sf::Keyboard::A:
+            if (!isCrouching)
+                mIsMovingLeft = isPressed;
+            break;
+        case sf::Keyboard::D:
+            if (!isCrouching)
+                mIsMovingRight = isPressed;
+            break;
+        case sf::Keyboard::J:
             // notice that in order to decide whether or not we want to jump, we need the isCrouching variable...
             if (!isJumping && !isCrouching)
             {
                 isJumping = true;
                 velocity.y = -1000;
             }
-        }
-        else if (key == sf::Keyboard::C)
-        {
+            break;
+        case sf::Keyboard::C:
             // notice that in order to decide whether or not we want to crouch, we need the isJumping variable...
             if (!isJumping)
             {
                 isCrouching = isPressed;
+                mIsMovingLeft = mIsMovingRight = false;
                 mPlayer.setFillColor(isPressed ? sf::Color::Red : sf::Color::Cyan);
             }
-        }
-        else if (key == sf::Keyboard::Space)
-        {
+            break;
+        case sf::Keyboard::Space:
             // notice that in order to decide whether or not we can dive, we need the isJumping variable
             // also, it is easy to write more complex check conditions that are given implicit
             // e.g., below, it feels natural to write (isJumping && !isCrouching), but we can omit !isCrouching
@@ -134,6 +139,7 @@ private:
                 isDiving = true;
                 mPlayer.setFillColor(sf::Color::Blue);
             }
+            break;
         }
     }
 
